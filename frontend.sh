@@ -5,36 +5,39 @@
 #Developer has chosen Nginx as a web server and thus we will install Nginx Web Server.
 
 #Install Nginx
-
-dnf install nginx -y
+echo Installing Nginx
+dnf install nginx -y >> /tmp/expense.log
 
 #Start & Enable Nginx service
-
-systemctl enable nginx
-systemctl start nginx
+echo Enable and start Nginx
+systemctl enable nginx >> /tmp/expense.log
+systemctl start nginx >> /tmp/expense.log
 
 
 #Copying configuration
-cp expense.conf /etc/nginx/default.d/expense.conf
+echo Placing Expense Config File in Nginx
+cp expense.conf /etc/nginx/default.d/expense.conf >> /tmp/expense.log
 
 #Remove the default content that web server is serving.
-
-rm -rf /usr/share/nginx/html/*
+echo Removing old nginx content
+rm -rf /usr/share/nginx/html/* >> /tmp/expense.log
 
 #Download the frontend content
-
-curl -o /tmp/frontend.zip https://expense-artifacts.s3.amazonaws.com/frontend.zip
+echo Download Frontend code
+curl -s -o /tmp/frontend.zip https://expense-artifacts.s3.amazonaws.com/frontend.zip
 
 #Extract the frontend content.
 
 cd /usr/share/nginx/html
-unzip /tmp/frontend.zip
+
+echo Exract Frontend code
+unzip /tmp/frontend.zip >> /tmp/expense.log
 
 #Note
 
 #Ensure you replace the localhost with the actual ip address of backend component server. Word localhost is just used to avoid the failures on the Nginx Server.
 
 #Restart Nginx Service to load the changes of the configuration.
-
-systemctl restart nginx
+echo Restart Nginx server
+systemctl restart nginx >> /tmp/expense.log
 
