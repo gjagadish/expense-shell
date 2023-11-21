@@ -1,40 +1,58 @@
-#Backend service is responsible for adding the given values to database. Backend service is written in NodeJS, Hence we need to install NodeJS.
-#Install NodeJS, By default NodeJS 10 is available, We would like to enable 18 version and install list.
+#log_file=/tmp/expense.log
+source common.sh
+component=backend
 
-dnf module disable nodejs -y
+
+echo Install Nodejs repos
+dnf module disable nodejs
 dnf module enable nodejs:18 -y
+echo $?
 
-dnf install nodejs -y
+echo Install NodeJs
+dnf install nodejs -y &>> $log_file
+echo $?
 
 
-cp backend.service /etc/systemd/system/backend.service
-#Add application User
+echo Copy Backend Service file
+cp backend.service /etc/systemd/system/backend.service &>> $log_file
+echo $?
 
-useradd -M -N -s /sbin/nologin expense
 
-#Lets setup an app directory.
-rm -rf /app
-mkdir /app
+echo Add Application user
+useradd -M -N -s /sbin/nologin expense &>> $log_file
+echo $?
 
-#Download the application code to created app directory.
+echo Clean App content
+rm -rf /app &>> $log_file
+echo $?
+mkdir /app &>> $log_file
 
-curl -o /tmp/backend.zip https://expense-artifacts.s3.amazonaws.com/backend.zip
 cd /app
-unzip /tmp/backend.zip
 
-#Every application is developed by development team will have some common softwares that they use as libraries. This application also have the same way of defined dependencies in the application configuration.
-#Lets download the dependencies.
+#Added below 2 lines in common.sh function download_and_extract. so commenting them
+#echo Download App Content
+#curl -o /tmp/backend.zip https://expense-artifacts.s3.amazonaws.com/backend.zip &>> $log_file
 
-npm install
+#Added below 2 lines in common.sh function download_and_extract. so commenting them
+#echo Extract App content
+#unzip /tmp/backend.zip &>> $log_file
 
+download_and_extract
 
+echo Download Dependencies
+npm install &>> $log_file
+echo $?
 
-systemctl daemon-reload
-systemctl enable backend
-systemctl start backend
+echo Start Backend Service
+systemctl daemon-reload &>> $log_file
+systemctl enable backend &>> $log_file
+systemctl start backend &>> $log_file
+echo $?
 
-#For this application to work fully functional we need to load schema to the Database.
+echo Install Mysql client
+dnf install mysql -y &>> $log_file
+echo $?
 
-dnf install mysql -y
-
-mysql -h mysql.jaga-devops.online -uroot -pExpenseApp@1 < /app/schema/backend.sql
+echo Load schema
+mysql -h mysql.jaga-devops.online -uroot -pExpenseApp@1 < /app/schema/backend.sql &>> $log_file
+echo $?
