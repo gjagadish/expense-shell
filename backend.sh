@@ -7,24 +7,58 @@ echo Install Nodejs repos
 dnf module disable nodejs
 dnf module enable nodejs:18 -y
 echo $?
+if [ $? -eq 0 ]
+then
+  echo -e "\e[32mSUCCESS\e[0m"
+else
+  echo -e "\e[31mFAILURE\e[0m"
+  exit 1
+fi
+
 
 echo Install NodeJs
 dnf install nodejs -y &>> $log_file
 echo $?
-
+if [ $? -eq 0 ]
+then
+  echo -e "\e[32mSUCCESS\e[0m"
+else
+  echo -e "\e[31mFAILURE\e[0m"
+  exit 1
+fi
 
 echo Copy Backend Service file
 cp backend.service /etc/systemd/system/backend.service &>> $log_file
 echo $?
-
+if [ $? -eq 0 ]
+then
+  echo -e "\e[32mSUCCESS\e[0m"
+else
+  echo -e "\e[31mFAILURE\e[0m"
+  exit 1
+fi
 
 echo Add Application user
 useradd -M -N -s /sbin/nologin expense &>> $log_file
 echo $?
+if [ $? -eq 0 ]
+then
+  echo -e "\e[32mSUCCESS\e[0m"
+else
+  echo -e "\e[31mFAILURE\e[0m"
+  exit 1
+fi
 
 echo Clean App content
 rm -rf /app &>> $log_file
 echo $?
+then
+  echo -e "\e[32mSUCCESS\e[0m"
+else
+  echo -e "\e[31mFAILURE\e[0m"
+  exit 1
+fi
+
 mkdir /app &>> $log_file
 
 cd /app
@@ -42,17 +76,49 @@ download_and_extract
 echo Download Dependencies
 npm install &>> $log_file
 echo $?
+if [ $? -eq 0 ]
+then
+  echo -e "\e[32mSUCCESS\e[0m"
+else
+  echo -e "\e[31mFAILURE\e[0m"
+  exit 1
+fi
+
 
 echo Start Backend Service
 systemctl daemon-reload &>> $log_file
 systemctl enable backend &>> $log_file
 systemctl start backend &>> $log_file
 echo $?
+if [ $? -eq 0 ]
+then
+  echo -e "\e[32mSUCCESS\e[0m"
+else
+  echo -e "\e[31mFAILURE\e[0m"
+  exit 1
+fi
+
 
 echo Install Mysql client
 dnf install mysql -y &>> $log_file
 echo $?
+if [ $? -eq 0 ]
+then
+  echo -e "\e[32mSUCCESS\e[0m"
+else
+  echo -e "\e[31mFAILURE\e[0m"
+  exit 1
+fi
+
+
 
 echo Load schema
 mysql -h mysql.jaga-devops.online -uroot -pExpenseApp@1 < /app/schema/backend.sql &>> $log_file
 echo $?
+if [ $? -eq 0 ]
+then
+  echo -e "\e[32mSUCCESS\e[0m"
+else
+  echo -e "\e[31mFAILURE\e[0m"
+  exit 1
+fi
